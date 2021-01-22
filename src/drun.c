@@ -16,7 +16,7 @@ void init_string(string_t *json)
      */
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     json->len = 0;
-    json->ptr = malloc(json->len + 1);
+    json->ptr = (char *) malloc(json->len + 1);
     if (json->ptr == NULL) {
         fputs("Allocation error", stderr);
         exit(EXIT_FAILURE);
@@ -30,7 +30,7 @@ size_t write_callback(const void *ptr, const size_t size, const size_t nmemb,
 {
     /* Update the length of the JSON, and allocate more memory if needed */
     const size_t new_len = json->len + size * nmemb;
-    json->ptr = realloc(json->ptr, new_len + 1);
+    json->ptr = (char *) realloc(json->ptr, new_len + 1);
     if (json->ptr == NULL) {
         fputs("Reallocation error", stderr);
         exit(EXIT_FAILURE);
