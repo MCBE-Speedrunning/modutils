@@ -1,9 +1,10 @@
 #define _GNU_SOURCE
-#include <curl/curl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <curl/curl.h>
 
 #include "drun.h"
 #include "jsmn.h"
@@ -88,7 +89,6 @@ void init_string(string_t *json)
      * Since this function is initializing `json`, we can ignore initialzation
      * warnings
      */
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     json->len = 0;
     json->ptr = malloc(json->len + 1);
     if (json->ptr == NULL) {
@@ -96,7 +96,7 @@ void init_string(string_t *json)
         exit(EXIT_FAILURE);
     }
     json->ptr[0] = '\0';
-#pragma GCC diagnostic warning "-Wmaybe-uninitialized"
+    return;
 }
 
 size_t write_callback(const void *ptr, const size_t size, const size_t nmemb,
@@ -178,8 +178,8 @@ int main(void)
     puts(video_uri);
 
     /* Cleanup and exit */
-    free(video_uri);
 EXIT:
+    free(video_uri);
     free(json.ptr);
     return EXIT_SUCCESS;
 }
