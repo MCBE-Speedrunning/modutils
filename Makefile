@@ -12,7 +12,7 @@ $(target): $(objs)
 	@mkdir -p bin/
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
-%.o: src/%.c
+%.o: src/%.c src/%.h
 	$(CC) $(CFLAGS) -c $<
 
 # Phony targets
