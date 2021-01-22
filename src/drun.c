@@ -54,7 +54,23 @@ char *parse_json(string_t *json)
                     exit(EXIT_FAILURE);
                 }
 
-                start = tokens[i + 6].start, end = tokens[i + 6].end;
+/*
+ * Set the token offset to 6, since the video URI comes 6 tokens after the
+ * "videos" key. The json looks like this:
+ * 
+ * "videos": {
+ *     "links": [
+ *         {
+ *             "uri": "https://youtu.be/2vjYnibdCBg"
+ *         }
+ *     ]
+ * },
+ * 
+ * TODO: Make this dynamic maybe
+ */
+#define TOK_OFFSET 6
+                start = tokens[i + TOK_OFFSET].start,
+                end = tokens[i + TOK_OFFSET].end;
                 strncpy(video_uri, &json->ptr[start], end - start);
                 video_uri[end - start] = '\0';
                 return video_uri;
