@@ -26,7 +26,7 @@ char *find_duplicate(FILE *fp, const char *video_uri)
         }
 
         /* Match found */
-        if (strcmp(line, video_uri) == 0)
+        if (strncmp(line, video_uri, strlen(video_uri)) == 0)
             return line;
     }
 
@@ -209,7 +209,8 @@ int main(void)
         puts("No duplicate found");
         fprintf(fp, "%s https://www.speedrun.com/run/%s\n", run.vid, run.id);
     } else {
-        puts("Duplicate video found!");
+        /* Offset the return to get the sr.c run URI */
+        printf("Duplicate video found!\n%s", duplicate + strlen(run.vid) + 1);
     }
 
     fclose(fp);
