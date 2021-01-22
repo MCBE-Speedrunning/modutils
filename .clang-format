@@ -5,6 +5,7 @@ AccessModifierOffset:                               -4
 AlignAfterOpenBracket:                              Align
 AlignConsecutiveAssignments:                        false
 AlignConsecutiveDeclarations:                       false
+AlignConsecutiveMacros:                             true
 AlignEscapedNewlines:                               Right
 AlignOperands:                                      true
 AlignTrailingComments:                              false
@@ -49,7 +50,7 @@ CompactNamespaces:                                  false
 ConstructorInitializerAllOnOneLineOrOnePerLine:     false
 ConstructorInitializerIndentWidth:                  4
 ContinuationIndentWidth:                            4
-Cpp11BracedListStyle:                               false
+Cpp11BracedListStyle:                               true
 DerivePointerAlignment:                             false
 DisableFormat:                                      false
 ExperimentalAutoDetectBinPacking:                   false
@@ -70,8 +71,8 @@ ObjCBlockIndentWidth:                               4
 ObjCSpaceAfterProperty:                             true
 ObjCSpaceBeforeProtocolList:                        true
 
-# Taken from git's rules
-PenaltyBreakAssignment:                             10
+# Taken from git's rules (Except PenaltyBreakAssignment)
+PenaltyBreakAssignment:                             30
 PenaltyBreakBeforeFirstCallParameter:               30
 PenaltyBreakComment:                                10
 PenaltyBreakFirstLessLess:                          0
