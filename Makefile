@@ -17,7 +17,7 @@ $(target): $(objs)
 
 # Phony targets
 .PHONY: install uninstall clean
-install: $(NAME)
+install: $(target)
 	mkdir -p $(PREFIX)/bin
 	cp $(target) $(PREFIX)/$(target)
 
