@@ -44,7 +44,7 @@ char *parse_json(string_t *json)
 #define TOKBUF 1024
     jsmntok_t tokens[TOKBUF];
     if (tokens == NULL) {
-        fputs("Allocation error", stderr);
+        fputs("Allocation error\n", stderr);
         exit(EXIT_FAILURE);
     }
     int ret = jsmn_parse(&parser, json->ptr, json->len, tokens, TOKBUF);
@@ -57,11 +57,11 @@ char *parse_json(string_t *json)
 
     switch (ret) {
     case JSMN_ERROR_INVAL:
-        JSON_ERR("bad token, JSON string is corrupted");
+        JSON_ERR("bad token, JSON string is corrupted\n");
     case JSMN_ERROR_NOMEM:
-        JSON_ERR("not enough tokens, JSON string is too large");
+        JSON_ERR("not enough tokens, JSON string is too large\n");
     case JSMN_ERROR_PART:
-        JSON_ERR("JSON string is too short, expecting more JSON data");
+        JSON_ERR("JSON string is too short, expecting more JSON data\n");
     }
 
     /* Find the "videos" object */
@@ -76,7 +76,7 @@ char *parse_json(string_t *json)
 #define URIBUF 128
                 char *video_uri = malloc(sizeof(char) * URIBUF + 1);
                 if (video_uri == NULL) {
-                    fputs("Allocation error", stderr);
+                    fputs("Allocation error\n", stderr);
                     free(json->ptr);
                     exit(EXIT_FAILURE);
                 }
@@ -114,7 +114,7 @@ void init_string(string_t *json)
     json->len = 0;
     json->ptr = malloc(json->len + 1);
     if (json->ptr == NULL) {
-        fputs("Allocation error", stderr);
+        fputs("Allocation error\n", stderr);
         exit(EXIT_FAILURE);
     }
     json->ptr[0] = '\0';
@@ -128,7 +128,7 @@ size_t write_callback(const void *ptr, const size_t size, const size_t nmemb,
     const size_t new_len = json->len + size * nmemb;
     json->ptr = realloc(json->ptr, new_len + 1);
     if (json->ptr == NULL) {
-        fputs("Reallocation error", stderr);
+        fputs("Reallocation error\n", stderr);
         exit(EXIT_FAILURE);
     }
 
@@ -181,6 +181,26 @@ void get_id(run_t *run)
         exit(EXIT_FAILURE);
     }
     run->id[read - 1] = '\0';
+
+    /*
+     * Support for URIs with the following formats:
+     *  - https://www.speedrun.com/game/run/ID
+     *  - www.speedrun.com/game/run/ID
+     * 
+     * the game/ part of the URI is optional
+     */
+    if (strncmp(run->id, "http", 4) == 0 || strncmp(run->id, "www", 3) == 0) {
+        char copy[strlen(run->id) + 1], *token, *prevtoken = run->id;
+        strcpy(copy, run->id);
+
+        /* Get the last token */
+        token = strtok(copy, "/");
+        while ((token = strtok(NULL, "/")))
+            prevtoken = token;
+
+        run->id = strcpy(run->id, prevtoken);
+    }
+
     return;
 }
 
@@ -193,7 +213,7 @@ int main(void)
 
     run.vid = parse_json(&run.json);
     if (run.vid == NULL) {
-        fputs("No video found", stderr);
+        fputs("No video found\n", stderr);
         goto EXIT;
     }
 
