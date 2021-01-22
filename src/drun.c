@@ -9,9 +9,34 @@
 #include "drun.h"
 #include "jsmn.h"
 
+char *find_duplicate(FILE *fp, const char *video_uri)
+{
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, fp))) {
+        if (read == -1) {
+            if (feof(fp))
+                break;
+
+            perror("drun");
+            free(line);
+            exit(EXIT_FAILURE);
+        }
+
+        /* Match found */
+        if (strcmp(line, video_uri) == 0)
+            return line;
+    }
+
+    /* No match found */
+    free(line);
+    return NULL;
+}
+
 char *parse_json(string_t *json)
 {
-    /* Initialize the JSON parser */
     jsmn_parser parser;
     jsmn_init(&parser);
 
@@ -24,6 +49,7 @@ char *parse_json(string_t *json)
     }
     int ret = jsmn_parse(&parser, json->ptr, json->len, tokens, TOKBUF);
 
+    /* TODO: Make this macro free run->id */
 #define JSON_ERR(STR)                                                          \
     fputs(STR, stderr);                                                        \
     free(json->ptr);                                                           \
@@ -85,10 +111,6 @@ char *parse_json(string_t *json)
 
 void init_string(string_t *json)
 {
-    /*
-     * Since this function is initializing `json`, we can ignore initialzation
-     * warnings
-     */
     json->len = 0;
     json->ptr = malloc(json->len + 1);
     if (json->ptr == NULL) {
@@ -118,14 +140,12 @@ size_t write_callback(const void *ptr, const size_t size, const size_t nmemb,
     return size * nmemb;
 }
 
-void dl_json(const char *runid, string_t *json)
+char *dl_json(const char *runid, string_t *json)
 {
-    /* Load the full URI into `uri` */
 #define BUFSIZE 64
-    char uri[BUFSIZE];
+    static char uri[BUFSIZE];
     snprintf(uri, BUFSIZE, "https://www.speedrun.com/api/v1/runs/%s", runid);
 
-    /* Initialize curl */
     CURL *curl = curl_easy_init();
     if (curl == NULL)
         exit(EXIT_FAILURE);
@@ -146,40 +166,59 @@ void dl_json(const char *runid, string_t *json)
     }
     curl_easy_cleanup(curl);
 
-    return;
+    return uri;
 }
 
-int main(void)
+void get_id(run_t *run)
 {
-    /* Get the run ID */
-    char *line = NULL;
+    run->id = NULL;
     size_t size = 0;
     ssize_t read;
-    if ((read = getline(&line, &size, stdin)) == -1) {
+    if ((read = getline(&run->id, &size, stdin)) == -1) {
         if (feof(stdin))
             exit(EXIT_SUCCESS);
 
         exit(EXIT_FAILURE);
     }
-    line[read - 1] = '\0';
+    run->id[read - 1] = '\0';
+    return;
+}
 
-    /* Get the runs JSON from the sr.c API */
-    string_t json;
-    init_string(&json);
-    dl_json(line, &json);
-    free(line);
+int main(void)
+{
+    run_t run;
+    get_id(&run);
+    init_string(&run.json);
+    dl_json(run.id, &run.json);
 
-    /* Parse the JSON */
-    char *video_uri = parse_json(&json);
-    if (video_uri == NULL) {
+    run.vid = parse_json(&run.json);
+    if (run.vid == NULL) {
         fputs("No video found", stderr);
         goto EXIT;
     }
-    puts(video_uri);
 
-    /* Cleanup and exit */
+    /* TODO: Seek to the beginning on BSD */
+    FILE *fp = fopen("runs", "a+");
+    if (fp == NULL) {
+        perror("drun");
+        exit(EXIT_FAILURE);
+    }
+
+    char *duplicate = find_duplicate(fp, run.vid);
+    if (duplicate == NULL) {
+        puts("No duplicate found");
+        fprintf(fp, "%s https://www.speedrun.com/run/%s\n", run.vid, run.id);
+    } else {
+        puts("Duplicate video found!");
+    }
+
+    fclose(fp);
+    if (duplicate != NULL)
+        free(duplicate);
+
 EXIT:
-    free(video_uri);
-    free(json.ptr);
+    free(run.id);
+    free(run.vid);
+    free(run.json.ptr);
     return EXIT_SUCCESS;
 }

@@ -18,10 +18,33 @@ typedef struct {
 } string_t;
 
 /**
+ * @brief A struct containing all the information required for the given run
+ * 
+ * @param json A string_t containing the result of the API request
+ * @param id The ID of the run on sr.c
+ * @param vid The uri of the runs video
+ */
+typedef struct {
+    string_t json;
+    char *id;
+    char *vid;
+} run_t;
+
+/**
+ * @brief Search the `runs` file for runs with the same video
+ * 
+ * @param fp Pointer to the `runs` file
+ * @param video_uri The uri to look for a duplicate of
+ * @return char* The uri of the duplicate run, if none found this is NULL
+ */
+char *find_duplicate(FILE *fp, const char *video_uri);
+
+/**
  * @brief Parse the JSON string to get the video URI
  * 
  * @param json The JSON to parse
- * @return char* The URI of the runs video
+ * @return char* The URI of the runs video, if no video is found the return
+ * value is NULL
  */
 char *parse_json(string_t *json);
 
@@ -49,7 +72,15 @@ size_t write_callback(const void *ptr, const size_t size, const size_t nmemb,
  * 
  * @param runid The ID of the run to get the json of
  * @param json Where to store the json
+ * @return char* The sr.c run URI
  */
-void dl_json(const char *runid, string_t *json);
+char *dl_json(const char *runid, string_t *json);
 
-#endif
+/**
+ * @brief Read the run id from stdin into `run->id`
+ * 
+ * @param run The run_t struct to store the id into 
+ */
+void get_id(run_t *run);
+
+#endif /* !__DRUN_H_ */
