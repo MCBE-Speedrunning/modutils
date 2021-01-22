@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <curl/curl.h>
 
@@ -203,8 +206,26 @@ void get_id(run_t *run)
     return;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+    int opt;
+    while ((opt = getopt(argc, argv, ":hv")) != -1) {
+        switch (opt) {
+        case 'h':
+            puts(HELP_MSG);
+            return EXIT_SUCCESS;
+        case 'v':
+            puts(VERSION_MSG);
+            return EXIT_SUCCESS;
+        default:
+            fprintf(stderr,
+                    "drun: invalid option -- '%c' \nTry 'drun -h' for more "
+                    "information.\n",
+                    optopt);
+            return EXIT_FAILURE;
+        }
+    }
+
     run_t run;
     get_id(&run);
     init_string(&run.json);
@@ -216,8 +237,26 @@ int main(void)
         goto EXIT;
     }
 
-    /* TODO: Seek to the beginning on BSD */
-    FILE *fp = fopen("runs", "a+");
+    /* Differs per system, and there is no easy way to get get the limit */
+#ifdef PATH_MAX
+#    undef PATH_MAX
+#    define PATH_MAX 1028
+#endif
+    const char *HOME = getenv("HOME");
+    char xdg_data_home[PATH_MAX - 5], runs_file[PATH_MAX];
+    snprintf(xdg_data_home, PATH_MAX - 5, "%s/.local/share/drun", HOME);
+    snprintf(runs_file, PATH_MAX, "%s/runs", xdg_data_home);
+
+    /* Create ~/.local/share/drun if it doesn't exist */
+    struct stat st = {0};
+    if (stat(xdg_data_home, &st) == -1) {
+        if (mkdir(xdg_data_home, 0777) == -1) {
+            perror("drun");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    FILE *fp = fopen(runs_file, "a+");
     if (fp == NULL) {
         perror("drun");
         exit(EXIT_FAILURE);

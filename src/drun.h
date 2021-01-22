@@ -1,6 +1,28 @@
 #ifndef __DRUN_H_
 #define __DRUN_H_
 
+/* -h message */
+#define HELP_MSG                                                               \
+    "Usage: drun [OPTIONS]... \n"                                              \
+    "A speedrun moderation tool to find stolen videos from STDIN \n"           \
+    "Example: echo 'https://www.speedrun.com/mcbe/run/yj6wel3z' | drun \n"     \
+    "\n"                                                                       \
+    "Miscellaneous: \n"                                                        \
+    "  -h                        display this help text and exit \n"           \
+    "  -v                        display version information and exit \n"      \
+    "\n"                                                                       \
+    "When a url is read from standard input, it will be compared against the " \
+    "\n"                                                                       \
+    "database file located in ~/.local/share/drun/runs. \n"                    \
+    "If no match is found, the run will be added to the database."
+
+/* -v message */
+#define VERSION_MSG                                                            \
+    "drun v1.0 \n"                                                             \
+    "License Unlicense: <https://unlicense.org> \n"                            \
+    "This is part of the modutils collection; see \n"                          \
+    "<https://www.github.com/MCBE-Speedrunning/modutils>"
+
 #ifndef size_t
 #    include <stdio.h>
 #endif
