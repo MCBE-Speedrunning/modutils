@@ -5,10 +5,25 @@
 #    include <stdio.h>
 #endif
 
+/**
+ * @brief A simple struct representing a string, to make working with them a
+ * a bit easier
+ * 
+ * @param ptr A pointer to the beginning of the string
+ * @param len The length of the string
+ */
 typedef struct {
     char *ptr;
     size_t len;
 } string_t;
+
+/**
+ * @brief Parse the JSON string to get the video URI
+ * 
+ * @param json The JSON to parse
+ * @return char* The URI of the runs video
+ */
+char *parse_json(string_t *json);
 
 /**
  * @brief Initialze the `string_t` struct
