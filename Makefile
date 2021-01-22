@@ -13,7 +13,7 @@ $(target): $(objs)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 %.o: src/%.c
-	$(CC) $(CFLAGS) -c $< $(DEPFLAGS)
+	$(CC) $(CFLAGS) -c $<
 
 # Phony targets
 .PHONY: install uninstall clean
@@ -25,4 +25,4 @@ uninstall:
 	rm -f $(PREFIX)/$(target)
 
 clean:
-	rm -f $(target) $(objs) $(deps)
+	rm -f $(target) $(objs)
