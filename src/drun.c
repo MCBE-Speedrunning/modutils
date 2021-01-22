@@ -1,5 +1,4 @@
 #define _GNU_SOURCE
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,7 +83,7 @@ char *parse_json(string_t *json)
 /*
  * Set the token offset to 6, since the video URI comes 6 tokens after the
  * "videos" key. The json looks like this:
- * 
+ *
  * "videos": {
  *     "links": [
  *         {
@@ -92,7 +91,7 @@ char *parse_json(string_t *json)
  *         }
  *     ]
  * },
- * 
+ *
  * TODO: Make this dynamic maybe
  */
 #define TOK_OFFSET 6
@@ -186,7 +185,7 @@ void get_id(run_t *run)
      * Support for URIs with the following formats:
      *  - https://www.speedrun.com/game/run/ID
      *  - www.speedrun.com/game/run/ID
-     * 
+     *
      * the game/ part of the URI is optional
      */
     if (strncmp(run->id, "http", 4) == 0 || strncmp(run->id, "www", 3) == 0) {
@@ -223,6 +222,15 @@ int main(void)
         perror("drun");
         exit(EXIT_FAILURE);
     }
+
+    /*
+     * For glibc, the initial file position for reading is at the beginning of
+     * the file, but for Android/BSD/MacOS, the initial file position for
+     * reading is at the end of the file.
+     */
+#if defined(__APPLE__) || defined(BSD)
+    fseek(fp, 0, SEEK_SET);
+#endif
 
     char *duplicate = find_duplicate(fp, run.vid);
     if (duplicate == NULL) {
