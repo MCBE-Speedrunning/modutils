@@ -268,7 +268,7 @@ int main(int argc, char **argv)
      * reading is at the end of the file.
      */
 #if defined(__APPLE__) || defined(__FreeBSD__)
-    fseek(fp, 0, SEEK_SET);
+    rewind(fp);
 #endif
 
     char *duplicate = find_duplicate(fp, run.vid);
