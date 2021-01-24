@@ -1,8 +1,5 @@
 #define _GNU_SOURCE
 #define _XOPEN_SOURCE
-#ifdef _WIN32
-#    include <conio.h>
-#endif
 #include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
@@ -11,8 +8,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "retime.h"
+#ifdef _WIN32
+#    include "getline.h"
+#endif
 #include "jsmn.h"
+#include "retime.h"
 
 void *smalloc(const size_t size)
 {
@@ -211,11 +211,9 @@ LOOP:
     fputs("Paste the debug info of the end of the run:\n", stderr);
     size_t end_time = trunc(get_time() * fps);
 
-#ifdef _WIN32
-    clrscr();
-#else
-    system("clear");
-#endif
+    /* Clear the screen */
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
 
     float duration = (end_time - start_time) / (float) fps;
     char *formatted_duration = format_time(duration);
