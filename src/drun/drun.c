@@ -240,8 +240,8 @@ int main(int argc, char **argv)
     /* Differs per system, and there is no easy way to get get the limit */
 #ifdef PATH_MAX
 #    undef PATH_MAX
-#    define PATH_MAX 1028
 #endif
+#define PATH_MAX 1028
     const char *HOME = getenv("HOME");
     char xdg_data_home[PATH_MAX - 5], runs_file[PATH_MAX];
     snprintf(xdg_data_home, PATH_MAX - 5, "%s/.local/share/drun", HOME);
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
      * the file, but for Android/BSD/MacOS, the initial file position for
      * reading is at the end of the file.
      */
-#if defined(__APPLE__) || defined(BSD)
+#if defined(__APPLE__) || defined(__FreeBSD__)
     fseek(fp, 0, SEEK_SET);
 #endif
 
