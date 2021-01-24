@@ -10,7 +10,7 @@ PREFIX := /usr/local
 # Compile the program
 all: $(target)
 $(target): $(objs)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	$(CC) -o $@ $^ $(LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INC) -c $<
