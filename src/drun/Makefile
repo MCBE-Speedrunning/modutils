@@ -1,4 +1,4 @@
-target := drun
+target := ../../bin/drun
 objs   := drun.o
 
 CC     := gcc
@@ -10,6 +10,7 @@ PREFIX := /usr/local
 # Compile the program
 all: $(target)
 $(target): $(objs)
+	@mkdir -p ../../bin
 	$(CC) -o $@ $^ $(LIBS)
 
 %.o: %.c
