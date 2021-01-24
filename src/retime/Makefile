@@ -1,10 +1,15 @@
-target := ../../bin/retime
 objs   := retime.o
 
-CC     := gcc
+ifdef WIN
+	CC     := i686-w64-mingw32-gcc
+	target := ../../bin/retime-windows.exe
+else
+	CC     := gcc
+	target := ../../bin/retime
+	LIBS   := -lm
+endif
 CFLAGS := -O3 -std=c99 -pedantic -Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes -Wno-unused-result
 INC    := -I ../../include/
-LIBS   := -lm
 PREFIX := /usr/local
 
 # Compile the program

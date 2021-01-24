@@ -219,7 +219,7 @@ LOOP:
     char *formatted_duration = format_time(duration);
 
     if (mflag)
-        printf("Mod Note: Retimed (Start: Frame %lu, End: Frame %lu, FPS: "
+        printf("Mod Note: Retimed (Start: Frame %zu, End: Frame %zu, FPS: "
                "%d, "
                "Total Time: %s)\n",
                start_time, end_time, fps, formatted_duration);
