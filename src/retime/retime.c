@@ -105,8 +105,7 @@ float get_time(void)
         if (tokens[i].type == JSMN_STRING) {
             int start = tokens[i].start, end = tokens[i].end;
             if (strncmp(&string[start], "cmt", end - start) == 0) {
-#define CMTBUF 16
-                char *time = smalloc(CMTBUF);
+                char *time = smalloc(end - start + 1);
                 start = tokens[i + 1].start, end = tokens[i + 1].end;
                 strncpy(time, &string[start], end - start);
                 time[end - start] = '\0';
@@ -123,7 +122,7 @@ float get_time(void)
 char *format_time(const float time)
 {
 /*
- * 14 is the max length of a time that can be input into speedrun.com, +1 for 
+ * 14 is the max length of a time that can be input into speedrun.com, +1 for
  * '\0'
  */
 #define FTIME_BUF 15
