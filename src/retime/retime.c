@@ -193,8 +193,11 @@ LOOP:
 
         fputs("Video Framerate: ", stderr);
         if ((read = getline(&fpsstr, &size, stdin)) == -1) {
-            perror("retime");
             free(fpsstr);
+            if (feof(stdin))
+                exit(EXIT_SUCCESS);
+
+            perror("retime");
             exit(EXIT_FAILURE);
         } else {
             fpsstr[read - 1] = '\0';
@@ -229,8 +232,8 @@ LOOP:
 
     /* Loop when bulk_retime is true */
     if (bflag) {
+        getchar();
         fps = 0;
-        fflush(stdin);
         goto LOOP;
     }
 
