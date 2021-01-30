@@ -46,12 +46,12 @@
 void *smalloc(const size_t size);
 
 /**
- * @brief Convert a string to a float
+ * @brief Convert a string to a double
  * 
- * @param str_time A float in the form of a string
- * @return float The converted float
+ * @param str_time A double in the form of a string
+ * @return double The converted double
  */
-float str_to_float(const char *str_time);
+double str_to_double(const char *str_time);
 
 /**
  * @brief Ensure that the input FPS is valid and convert it from a string to an
@@ -65,9 +65,9 @@ unsigned int check_fps(char *string);
 /**
  * @brief Get the total duration of the run
  * 
- * @return float The duration of the run
+ * @return double The duration of the run
  */
-float get_time(void);
+double get_time(void);
 
 /**
  * @brief Format the runs duration in the form HH:MM:SS.ms
@@ -75,6 +75,6 @@ float get_time(void);
  * @param time The runs duration in seconds
  * @return char* The formatted duration
  */
-char *format_time(const float time);
+char *format_time(const double time);
 
 #endif /* !__RETIME_H_ */

@@ -24,10 +24,10 @@ void *smalloc(const size_t size)
     return ret;
 }
 
-float str_to_float(const char *str_time)
+double str_to_double(const char *str_time)
 {
-    unsigned int i = 0, sigfig = 0;
-    float time = 0;
+    unsigned int i = 0, sigfig = 1;
+    double time = 0;
 
     while (str_time[i] != '.') {
         if (str_time[i] == '\0')
@@ -50,7 +50,7 @@ unsigned int check_fps(char *string)
         if (!isdigit(string[i]))
             goto INVALID_FPS;
 
-    const unsigned int fps = (unsigned int) str_to_float(string);
+    const unsigned int fps = (unsigned int) str_to_double(string);
 
     if (fps > 60 || fps < 1)
         goto INVALID_FPS;
@@ -62,7 +62,7 @@ INVALID_FPS:
     exit(BAD_FPS);
 }
 
-float get_time(void)
+double get_time(void)
 {
     char *string = NULL;
     size_t size = 0;
@@ -111,7 +111,7 @@ float get_time(void)
                 time[end - start] = '\0';
 
                 free(string);
-                return str_to_float(time);
+                return str_to_double(time);
             }
         }
     }
@@ -119,27 +119,24 @@ float get_time(void)
     return -1;
 }
 
-char *format_time(const float time)
+char *format_time(const double time)
 {
-/*
- * 14 is the max length of a time that can be input into speedrun.com, +1 for
- * '\0'
- */
-#define FTIME_BUF 15
+#define FTIME_BUF 32
     char *formatted_time = smalloc(FTIME_BUF);
-    const unsigned int hours = time / 3600, minutes = fmod(time, 3600) / 60,
-                       seconds = fmod(time, 60),
-                       milliseconds = fmod(trunc(round(time * 1000)), 1000);
+    const unsigned int hours = time / 3600,
+                       minutes = fmod(time, (double) 3600) / 60,
+                       seconds = fmod(time, (double) 60),
+                       milliseconds = fmod(round(time * 1000), (double) 1000);
 
     if (!hours) {
         if (!minutes)
-            snprintf(formatted_time, FTIME_BUF, "%d.%03d", seconds,
+            snprintf(formatted_time, FTIME_BUF, "%u.%03u", seconds,
                      milliseconds);
         else
-            snprintf(formatted_time, FTIME_BUF, "%d:%02d.%03d", minutes,
+            snprintf(formatted_time, FTIME_BUF, "%u:%02u.%03u", minutes,
                      seconds, milliseconds);
     } else {
-        snprintf(formatted_time, FTIME_BUF, "%d:%02d:%02d.%03d", hours, minutes,
+        snprintf(formatted_time, FTIME_BUF, "%u:%02u:%02u.%03u", hours, minutes,
                  seconds, milliseconds);
     }
 
@@ -186,7 +183,7 @@ int main(int argc, char **argv)
     }
 
 LOOP:
-    if (fps == 0) {
+    if (!fps) {
         char *fpsstr = NULL;
         size_t size = 0;
         ssize_t read;
@@ -208,21 +205,21 @@ LOOP:
     }
 
     /* Prompt the user for the start and end of the run */
-    fputs("Paste the debug info of the start of the run:\n", stderr);
-    size_t start_time = trunc(get_time() * fps);
-    fputs("Paste the debug info of the end of the run:\n", stderr);
-    size_t end_time = trunc(get_time() * fps);
+    puts("Paste the debug info of the start of the run:");
+    const unsigned int start_time = get_time() * fps / 1;
+    puts("Paste the debug info of the end of the run:");
+    const unsigned int end_time = get_time() * fps / 1;
 
     /* Clear the screen */
     write(STDOUT_FILENO, "\x1b[2J", 4);
     write(STDOUT_FILENO, "\x1b[H", 3);
 
-    float duration = (end_time - start_time) / (float) fps;
+    const double duration = (end_time - start_time) / (double) fps;
     char *formatted_duration = format_time(duration);
 
     if (mflag)
-        printf("Mod Note: Retimed (Start: Frame %zu, End: Frame %zu, FPS: "
-               "%d, "
+        printf("Mod Note: Retimed (Start: Frame %u, End: Frame %u, FPS: "
+               "%u, "
                "Total Time: %s)\n",
                start_time, end_time, fps, formatted_duration);
     else
