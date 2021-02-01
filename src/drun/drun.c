@@ -70,7 +70,8 @@ char *parse_json(string_t *json)
     for (int i = 0; i < ret; i++) {
         if (tokens[i].type == JSMN_STRING) {
             int start = tokens[i].start, end = tokens[i].end;
-            if (strncmp(&json->ptr[start], "videos", end - start) == 0) {
+            if (strncmp(&json->ptr[start], "videos", end - start) == 0
+                || strncmp(&json->ptr[start], "text", end - start) == 0) {
                 /*
                  * Read in the video URL which is at an offset of 6 from the
                  * "videos" token into `video_uri`
